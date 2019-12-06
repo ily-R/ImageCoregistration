@@ -29,30 +29,32 @@ python image_register.py img1.jpg img2.jpg -s 0.5 --sift -r
 ```
 * `img1.jpg img2.jpg` are positional arguments representing the names of the target and source image.
 * `--scale 0.5` or abbreviation `-s 0.5` is the scale by which we resize the input images. **default** = 0.1.
-*`--sift` a boolean flag. If *True* use Harris detectors then sift descriptor. If *False* the images will be displayed and the user has to click on both images to selected the prefered landmarks to be passed to SIFT.**default** = *False*.
-* * `--rasnac` or abbreviation `-r` a boolean flag. If *True* use RANSAC algorithm to select only the inliers for the affine matrix estimation step. Useful when the images have a lot of similar pattern in different positions in the image. **default** = *False*.
+* `--sift` a boolean flag. If *True* use Harris detectors then sift descriptor. If *False* the images will be displayed and the user has to click on both images to selected the prefered landmarks to be passed to SIFT.**default** = *False*.
+* `--rasnac` or abbreviation `-r` a boolean flag. If *True* use RANSAC algorithm to select only the inliers for the affine matrix estimation step. Useful when the images have a lot of similar pattern in different positions in the image. **default** = *False*.
 
 # Notes
-* `result\` folder contains the source and target images on alligned. Additionally, if *True* flags are passed in inner function, the folder will contain other results.
+* `result\` folder contains the source and target images alligned. Additionally, if *True* flags are passed in inner functions, the folder will contain other results.
   * if `save = True` in ```display_matches(target, source, lmk1, lmk2, name="matches, save=False")``` it will save both images horizontally stacked with landmarks matched.
   * if `save = True` in ```display_matches(target, source, outliers1, outliers2, name="matches_removed_by_RANSAC", num=5, save=True)``` it will save and image that showes the landmarks rejected by RASNAC.
-  *if `save = True` in ```mi = mutual_inf(warped, target_w, verbose=True)``` it will save the joint-histogram of warped-source image and the target image.
+  * if `save = True` in ```mi = mutual_inf(warped, target_w, verbose=True)``` it will save the joint-histogram of warped-source image and the target image.
 
 # Testing
 ### Original images:
-We can see that there a slight translation upward with some maybe a small rotation to the left.
+We can see that there a slight translation upward with probably small rotation to the left.
+
 <p align="center">
   <img src="https://github.com/ily-R/ImageCoregistration/blob/master/readmeImages/original.gif?raw=true" alt="capture reconstruction"/>
 </p>
+
 ### Floating the source image:
-Applying the registation on the source image, we see how it floats from its original position to another upward. This is done to assure that most pixels are alligned.
+Applying the registation on the source image, we see how it floats from its original position to another upward. This is done to assure that most pixels are alligned to the target ones.
 
 <p align="center">
   <img src="https://github.com/ily-R/ImageCoregistration/blob/master/readmeImages/source_moving.gif?raw=true" alt="capture reconstruction"/>
 </p>
 
 ### Result:
-Floating the source image we see how perfectly are the images aligned. To not get distracted by the upper border moving, put the tip of the mouse on any position and verify that the mouse tip stand steel. If you do this in the above gif, the tip will change positions.
+Floating the source image we see how perfectly are the images aligned. To not get distracted by the upper border moving, put the tip of the mouse on any position and verify that the mouse tip stands steel. If you do this in the above gif, the tip will change positions.
 
 <p align="center">
   <img src="https://github.com/ily-R/ImageCoregistration/blob/master/readmeImages/solution.gif?raw=true" alt="capture reconstruction"/>
@@ -82,7 +84,7 @@ Two metrics are used plus the reconstruction error:
 </p>
 
 # More Testing
-Here are some screen shot taken from Google maps satellite.
+Here are some screen shot taken from Google maps satellite above the Eiffel tower
 
 <img width = 400 align="left" src="https://github.com/ily-R/ImageCoregistration/blob/master/data/s1.jpg?raw=true" alt="capture reconstruction">	
 <p align="right">
@@ -101,7 +103,7 @@ Applying the registration to float the source to the target image we get the fol
   <img src="https://github.com/ily-R/ImageCoregistration/blob/master/readmeImages/paris.gif?raw=true" alt="capture reconstruction"/>
 </p>
 
-You can see how the Eiffel tower is moving, which indicates the two images present in the gif come from different perspective.
+You can see how the Eiffel tower is moving, which indicates the two images present in the gif come from different perspectives. Which in our case the source and target images.
 
 # Future work:
 * Add more robust feature for noisy SAR images like 
