@@ -9,10 +9,11 @@ import numpy as np
 import os
 from sklearn import linear_model
 import warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
+
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
-def display_matches(img1, img2, kp1, kp2,name, num=20, save=False):
+def display_matches(img1, img2, kp1, kp2, name, num=20, save=False):
     """Helper to display matches of keypoint in botch images, by connecting a line from one image to another
 
     Typical use:
@@ -26,9 +27,13 @@ def display_matches(img1, img2, kp1, kp2,name, num=20, save=False):
     if img1.shape[0] != img2.shape[0]:
         minn = min(img1.shape[0], img1.shape[0])
         if minn == img1.shape[0]:
-            img1 = np.concatenate((img1, np.zeros(img2.shape[0] - minn, img1.shape[1], 3)), axis=0)
+            img1 = np.concatenate(
+                (img1, np.zeros(img2.shape[0] - minn, img1.shape[1], 3)), axis=0
+            )
         else:
-            img2 = np.concatenate((img2, np.zeros(img1.shape[0] - minn, img2.shape[1], 3)), axis=0)
+            img2 = np.concatenate(
+                (img2, np.zeros(img1.shape[0] - minn, img2.shape[1], 3)), axis=0
+            )
     img = np.concatenate((img1, img2), axis=1)
     for i in np.random.choice(len(kp1), min(num, len(kp1))):
         x1, y1 = int(kp1[i][0]), int(kp1[i][1])
@@ -37,7 +42,7 @@ def display_matches(img1, img2, kp1, kp2,name, num=20, save=False):
     cv2.namedWindow(name, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(name, img.shape[1], img.shape[0])
     cv2.imshow(name, img)
-    cv2.imwrite(os.path.join("result", name+".jpg"), img)
+    cv2.imwrite(os.path.join("result", name + ".jpg"), img)
 
 
 def match(lmk1, lmk2, desc1, desc2, sift_error=0.7):
@@ -73,10 +78,12 @@ def cross_corr(img1, img2):
     img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
     mean1, mean2 = np.mean(img1), np.mean(img2)
-    img1, img2 = img1-mean1, img2-mean2
+    img1, img2 = img1 - mean1, img2 - mean2
     numerator = np.sum(np.multiply(img1, img2))
-    denominator = np.sqrt(np.sum(np.multiply(img1, img1))*np.sum(np.multiply(img2, img2)))
-    corr = numerator/denominator
+    denominator = np.sqrt(
+        np.sum(np.multiply(img1, img1)) * np.sum(np.multiply(img2, img2))
+    )
+    corr = numerator / denominator
     print("Cross-correlation: ", corr)
     return corr
 
@@ -91,7 +98,7 @@ def mutual_inf(img1, img2, verbose=False):
 
     verbose: if verbose=True, display and save the joint-histogram between the two images.
     """
-    epsilon = 1.e-6
+    epsilon = 1.0e-6
     img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
     img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
     img1 = np.round(img1).astype("uint8")
@@ -104,16 +111,20 @@ def mutual_inf(img1, img2, verbose=False):
 
     if verbose:
         display_jh = np.log(joint_hist + epsilon)
-        display_jh = 255*(display_jh - display_jh.min())/(display_jh.max() - display_jh.min())
+        display_jh = (
+            255
+            * (display_jh - display_jh.min())
+            / (display_jh.max() - display_jh.min())
+        )
         cv2.imshow("joint_histogram", display_jh)
         cv2.imwrite("result/joint_histogram.jpg", display_jh)
 
     joint_hist /= np.sum(joint_hist)
     p1 = np.sum(joint_hist, axis=0)
     p2 = np.sum(joint_hist, axis=1)
-    joint_hist_d = joint_hist/(p1+epsilon)
-    joint_hist_d /= (p2+epsilon)
-    mi = np.sum(np.multiply(joint_hist, np.log(joint_hist_d+epsilon)))
+    joint_hist_d = joint_hist / (p1 + epsilon)
+    joint_hist_d /= p2 + epsilon
+    mi = np.sum(np.multiply(joint_hist, np.log(joint_hist_d + epsilon)))
     print("Mutual Information: ", mi)
     return mi
 
@@ -143,8 +154,12 @@ def calculate_transform(kp1, kp2):
 
     kp1, kp2: landmarks of target and source images respectively as np.ndarray
     """
-    upper = np.concatenate((kp1, np.ones((kp1.shape[0], 1)), np.zeros((kp1.shape[0], 3))), axis=1)
-    lower = np.concatenate((np.zeros((kp1.shape[0], 3)), kp1, np.ones((kp1.shape[0], 1))), axis=1)
+    upper = np.concatenate(
+        (kp1, np.ones((kp1.shape[0], 1)), np.zeros((kp1.shape[0], 3))), axis=1
+    )
+    lower = np.concatenate(
+        (np.zeros((kp1.shape[0], 3)), kp1, np.ones((kp1.shape[0], 1))), axis=1
+    )
     X = np.concatenate((upper, lower), axis=0)
     Y = np.concatenate((kp2[:, 0], kp2[:, 1]))
     Y = np.expand_dims(Y, axis=-1)
@@ -174,13 +189,17 @@ def warp(target, source, T):
 
     # move both images to the center a bit
     corners = np.float32([[0, 0], [0, height], [width, 0], [width, height]])
-    corners_moved = np.float32([[5, 5], [5, height + 5], [5 + width, 5], [5 + width, 5 + height]])
+    corners_moved = np.float32(
+        [[5, 5], [5, height + 5], [5 + width, 5], [5 + width, 5 + height]]
+    )
     T_perspective = cv2.getPerspectiveTransform(corners, corners_moved)
     target_new = cv2.warpPerspective(target, T_perspective, (width + 10, height + 10))
     cv2.imshow("target_new", target_new)
     cv2.imwrite("result/target_new.jpg", target_new)
     T = np.dot(T_perspective, T)
-    source_new = cv2.warpPerspective(source, T, (width + 10, height + 10), cv2.INTER_AREA)
+    source_new = cv2.warpPerspective(
+        source, T, (width + 10, height + 10), cv2.INTER_AREA
+    )
     cv2.imshow("source_new", source_new)  # show transform
     cv2.imwrite("result/source_new.jpg", source_new)
     return source_new, target_new

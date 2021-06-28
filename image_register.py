@@ -58,13 +58,20 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("target", help="target image name")
     parser.add_argument("source", help="source image name")
-    parser.add_argument('-s', '--scale', default=.1, type=float,
-                        help='rescale the images with this factor in range [0, 1]')
+    parser.add_argument(
+        "-s",
+        "--scale",
+        default=0.1,
+        type=float,
+        help="rescale the images with this factor in range [0, 1]",
+    )
 
-    parser.add_argument("-r","--ransac", help="apply ransac", action="store_true")
+    parser.add_argument("-r", "--ransac", help="apply ransac", action="store_true")
 
     args = parser.parse_args()
-    target, source, target_gray, source_gray, target_full, source_full = readAndRescale(args.target, args.source, args.scale)
+    target, source, target_gray, source_gray, target_full, source_full = readAndRescale(
+        args.target, args.source, args.scale
+    )
 
     lmk1, lmk2, desc1, desc2 = getKeypointAndDescriptors(target_gray, source_gray)
 
@@ -72,10 +79,17 @@ if __name__ == "__main__":
     display_matches(target, source, lmk1, lmk2, name="matches")
     if args.ransac:
         lmk1, lmk2, outliers1, outliers2 = ransac(lmk1, lmk2)
-        display_matches(target, source, outliers1, outliers2, name="matches_removed_by_RANSAC", num=5, save=True)
+        display_matches(
+            target,
+            source,
+            outliers1,
+            outliers2,
+            name="matches_removed_by_RANSAC",
+            num=5,
+            save=True,
+        )
 
     T = calculate_transform(lmk2, lmk1)
     warped, target_w = warp(target, source, T)
     cc = cross_corr(warped, target_w)
     mi = mutual_inf(warped, target_w, verbose=True)
-
