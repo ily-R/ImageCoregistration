@@ -37,8 +37,6 @@ def display_matches(img1, img2, kp1, kp2,name, num=20, save=False):
     cv2.namedWindow(name, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(name, img.shape[1], img.shape[0])
     cv2.imshow(name, img)
-    # cv2.waitKey()
-    # cv2.destroyAllWindows()
     cv2.imwrite(os.path.join("result", name+".jpg"), img)
 
 
@@ -108,8 +106,6 @@ def mutual_inf(img1, img2, verbose=False):
         display_jh = np.log(joint_hist + epsilon)
         display_jh = 255*(display_jh - display_jh.min())/(display_jh.max() - display_jh.min())
         cv2.imshow("joint_histogram", display_jh)
-        # cv2.waitKey()
-        cv2.destroyAllWindows()
         cv2.imwrite("result/joint_histogram.jpg", display_jh)
 
     joint_hist /= np.sum(joint_hist)
@@ -187,6 +183,4 @@ def warp(target, source, T):
     source_new = cv2.warpPerspective(source, T, (width + 10, height + 10), cv2.INTER_AREA)
     cv2.imshow("source_new", source_new)  # show transform
     cv2.imwrite("result/source_new.jpg", source_new)
-    # cv2.waitKey()
-    cv2.destroyAllWindows()
     return source_new, target_new
