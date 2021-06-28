@@ -2,29 +2,22 @@
 
 A simple Image regestring method based on SIFT descriptors and RANSAC algorithm for filtering out the outliers.
 
-# Requirements
-* Python3
-* numpy
-* opencv
-* sklearn
-
 # Setup
-```
-git clone https://github.com/ily-R/ImageCoregistration.git
-cd ImageCoregistration
-```
+* `python3 -m venv venv`
+* `source venv/bin/activate`
+* `pip install -r requirements.txt`
 
 # Usage
 Very easy to use. Put the images you want to register, the target and the source(say "img1.jpg" and "img2.jpg") in `data\` folder and run the follwing.
 
 ```
-python image_register.py img1.jpg img2.jpg --sift
+python3 image_register.py img1.jpg img2.jpg
 ```
 
 # Arguments
 This is the full set of system arguments supported.
 ```
-python image_register.py img1.jpg img2.jpg -s 0.5 --sift -r
+python3 image_register.py img1.jpg img2.jpg -s 0.5 -r
 
 ```
 * `img1.jpg img2.jpg` are positional arguments representing the names of the target and source image.

@@ -37,59 +37,60 @@ def readAndRescale(img1, img2, scale):
     return target_s, source_s, gray1, gray2, target, source
 
 
-def getClicksAndDescriptor(target, source, target_gray, source_gray):
-    """Helper to get user mouse-clicks, use them as landmarks for sift descriptors.
-        it returns the closets real sift to these landmarks and their descriptors
+# def getClicksAndDescriptor(target, source, target_gray, source_gray):
+#     """Helper to get user mouse-clicks, use them as landmarks for sift descriptors.
+#         it returns the closets real sift to these landmarks and their descriptors
 
-    Typical use:
-        lmk1, lmk2, desc1, desc2 = getClicksAndDescriptor(target, source, target_gray, source_gray)
+#     Typical use:
+#         lmk1, lmk2, desc1, desc2 = getClicksAndDescriptor(target, source, target_gray, source_gray)
 
-    target, source: target and source images as np.ndarray
-    target_gray, source_gray: grayscaled target and source images as np.ndarray
-    """
-    def getClick(event, x, y, flags, param):
-        global p1, p2, on_target
-        if event == cv2.EVENT_LBUTTONDOWN:
-            if on_target:
-                p1.append((x, y))
-            else:
-                p2.append((x, y))
+#     target, source: target and source images as np.ndarray
+#     target_gray, source_gray: grayscaled target and source images as np.ndarray
+#     """
+#     def getClick(event, x, y, flags, param):
+#         global p1, p2, on_target
+#         if event == cv2.EVENT_LBUTTONDOWN:
+#             if on_target:
+#                 p1.append((x, y))
+#             else:
+#                 p2.append((x, y))
 
-    cv2.namedWindow("target")
-    cv2.setMouseCallback("target", getClick)
-    global p1, p2, on_target
-    while True:
-        cv2.imshow("target", target)
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord("c"):
-            cv2.destroyAllWindows()
-            break
-    cv2.namedWindow("source")
-    cv2.setMouseCallback("source", getClick)
-    on_target = False
-    while True:
-        cv2.imshow("source", source)
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord("c"):
-            cv2.destroyAllWindows()
-            break
-    p1, p2 = np.array(p1), np.array(p2)
-    if len(p1) != len(p2):
-        minn = min(len(p1), len(p2))
-        p1 = p1[:minn]
-        p2 = p2[:minn]
-    sift = cv2.xfeatures2d.SIFT_create()
-    kp1, des1 = sift.detectAndCompute(target_gray, None)
-    pts1_all = np.array([kp1[idx].pt for idx in range(0, len(kp1))])
-    kp2, des2 = sift.detectAndCompute(source_gray, None)
-    pts2_all = np.array([kp2[idx].pt for idx in range(0, len(kp2))])
-    indices1, indices2 = [], []
-    for i in range(p1.shape[0]):
-        distance = np.sqrt(np.sum((p1[i] - pts1_all) ** 2, axis=1))
-        indices1.append(np.argmin(distance))
-        distance = np.sqrt(np.sum((p2[i] - pts2_all) ** 2, axis=1))
-        indices2.append(np.argmin(distance))
-    return pts1_all[indices1], pts2_all[indices2], des1[indices1], des2[indices2]
+#     cv2.namedWindow("target")
+#     cv2.setMouseCallback("target", getClick)
+#     global p1, p2, on_target
+#     while True:
+#         cv2.imshow("target", target)
+#         key = cv2.waitKey(1) & 0xFF
+#         if key == ord("c"):
+#             cv2.destroyAllWindows()
+#             break
+#     cv2.namedWindow("source")
+#     cv2.setMouseCallback("source", getClick)
+#     on_target = False
+#     while True:
+#         cv2.imshow("source", source)
+#         key = cv2.waitKey(1) & 0xFF
+#         if key == ord("c"):
+#             cv2.destroyAllWindows()
+#             break
+#     p1, p2 = np.array(p1), np.array(p2)
+#     if len(p1) != len(p2):
+#         minn = min(len(p1), len(p2))
+#         p1 = p1[:minn]
+#         p2 = p2[:minn]
+#     # sift = cv2.xfeatures2d.SIFT_create()
+#     sift = cv2.SIFT_create()
+#     kp1, des1 = sift.detectAndCompute(target_gray, None)
+#     pts1_all = np.array([kp1[idx].pt for idx in range(0, len(kp1))])
+#     kp2, des2 = sift.detectAndCompute(source_gray, None)
+#     pts2_all = np.array([kp2[idx].pt for idx in range(0, len(kp2))])
+#     indices1, indices2 = [], []
+#     for i in range(p1.shape[0]):
+#         distance = np.sqrt(np.sum((p1[i] - pts1_all) ** 2, axis=1))
+#         indices1.append(np.argmin(distance))
+#         distance = np.sqrt(np.sum((p2[i] - pts2_all) ** 2, axis=1))
+#         indices2.append(np.argmin(distance))
+#     return pts1_all[indices1], pts2_all[indices2], des1[indices1], des2[indices2]
 
 
 def getKeypointAndDescriptors(target_gray, source_gray):
@@ -101,7 +102,8 @@ def getKeypointAndDescriptors(target_gray, source_gray):
 
     target_gray, source_gray: grayscaled target and source images as np.ndarray
     """
-    sift = cv2.xfeatures2d.SIFT_create()
+    # sift = cv2.xfeatures2d.SIFT_create()
+    sift = cv2.SIFT_create()
     kp1, des1 = sift.detectAndCompute(target_gray, None)
     pts1 = np.array([kp1[idx].pt for idx in range(len(kp1))])
     kp2, des2 = sift.detectAndCompute(source_gray, None)
@@ -115,19 +117,19 @@ if __name__ == "__main__":
     parser.add_argument("source", help="source image name")
     parser.add_argument('-s', '--scale', default=.1, type=float,
                         help='rescale the images with this factor in range [0, 1]')
-    parser.add_argument("--sift", help="apply harris point of interest detect and sift descriptor", action="store_true")
+    # parser.add_argument("--sift", help="apply harris point of interest detect and sift descriptor", action="store_true")
 
     parser.add_argument("-r","--ransac", help="apply ransac", action="store_true")
 
     args = parser.parse_args()
     target, source, target_gray, source_gray, target_full, source_full = readAndRescale(args.target, args.source, args.scale)
 
-    if not args.sift:
-        on_target = True
-        p1, p2 = [], []
-        lmk1, lmk2, desc1, desc2 = getClicksAndDescriptor(target, source, target_gray, source_gray)
-    else:
-        lmk1, lmk2, desc1, desc2 = getKeypointAndDescriptors(target_gray, source_gray)
+    # if not args.sift:
+    #     on_target = True
+    #     p1, p2 = [], []
+    #     lmk1, lmk2, desc1, desc2 = getClicksAndDescriptor(target, source, target_gray, source_gray)
+    # else:
+    lmk1, lmk2, desc1, desc2 = getKeypointAndDescriptors(target_gray, source_gray)
 
     lmk1, lmk2 = match(lmk1, lmk2, desc1, desc2)
     display_matches(target, source, lmk1, lmk2, name="matches")
